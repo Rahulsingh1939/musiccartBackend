@@ -1,5 +1,9 @@
-const { hashPassword } = require('../helper/authHelper');
+const { response } = require('express');
+const { hashPassword, comparePassword } = require('../helper/authHelper');
 const userModel = require('../models/user');
+
+const JWT = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const registerController = async (req,res) =>{
     try {
@@ -41,10 +45,56 @@ const registerController = async (req,res) =>{
         console.log(error);
         res.status(500).send({
             success: false,
-            message:'Error while registering',
+            message:'Error while Registering',
             error
         })
     }
 }
+const loginController= async (req, res) => {
+    try {
+        const {email,password} = req.body;
+        if(!email || !password){
+            res.status(403).send({
+                success:false,
+                message: 'Invalid Email or Password'
+            })
+        }
+        //Check User
+        const user = await userModel.findOne({email: email});
+        if(!user){
+            return res.status(403).send({
+                success:false,
+                message: 'Email is Not Registered'
+            });
+        }
+        const match= await comparePassword(password,user.password)
+        if(!match){
+            return res.status(200).send({
+                sucess:true,
+                message: 'Invalid Password'
+            })
+        }
+        //Token Generation
+        const token = await JWT.sign({_id:user._id},JWT_SECRET,{
+            expiresIn:'7d'
+        });
+        res.status(200).send({
+            success:true,
+            message: 'User Logged In Successfully',
+            user:{
+                name:user.name,
+                mobile:user.mobile,
+                email:user.email
+            },
+            token
+        });
 
-module.exports = {registerController}
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message:'Error while Login',
+            error
+        })
+    }
+}
+module.exports = {registerController,loginController}
