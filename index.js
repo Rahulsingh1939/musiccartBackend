@@ -3,7 +3,6 @@ const express = require('express')
 const bodyparser = require('body-parser')
 const mongoose = require('mongoose')
 const cors = require('cors')
-const ejs = require('ejs')
 
 const app = express()
 
@@ -20,6 +19,7 @@ const MONGODB_URL = process.env.MONGODB_URL
 
 //
 const healthRoute = require('./routes/healthRoute')
+const authRoute = require('./routes/authRoute')
 
 //Global MiddleWares
 app.use(bodyparser.urlencoded({extended:true}))
@@ -36,7 +36,7 @@ app.get('/',(req,res)=>{
 })
 
 // ROUTES
-// app.use('/api/v1',)
+app.use('/api/v1/auth',authRoute)
 app.use('/api/health',healthRoute)
 
 
