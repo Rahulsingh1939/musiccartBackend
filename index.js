@@ -19,6 +19,7 @@ const MONGODB_URL = process.env.MONGODB_URL;
 //
 const healthRoute = require("./routes/healthRoute");
 const authRoute = require("./routes/authRoute");
+const categoryRoute = require("./routes/categoryRoute");
 
 //Global MiddleWares
 app.use(bodyparser.urlencoded({ extended: true }));
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 
 // ROUTES
 app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/category",categoryRoute);
 app.use("/api/health", healthRoute);
 
 //APP LISTENING ON PORT
