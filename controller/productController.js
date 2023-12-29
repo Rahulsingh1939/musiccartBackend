@@ -8,6 +8,7 @@ const getAll = async (req, res) => {
     const products = await productModel.find({});
     res.status(200).send({
       success: true,
+      productCount:products.length,
       message: "All Products List",
       products,
     });
