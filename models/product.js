@@ -32,6 +32,14 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    photoUrl:{
+      type:String,
+      required: true,
+    },
+    color:{
+      type:String, // Can only be Black, White or Blue
+      required: true,
+    },
     About: {
       type: [String],
     },
