@@ -5,7 +5,7 @@ const createProduct = async (req, res) => {};
 //Get All Products
 const getAll = async (req, res) => {
   try {
-    const products = await productModel.find({}).populate("category");
+    const products = await productModel.find({}).populate("category").limit(5);
     res.status(200).send({
       success: true,
       productCount: products.length,
@@ -41,4 +41,29 @@ const getProduct = async (req, res) => {
     });
   }
 };
-module.exports = { createProduct, getAll, getProduct };
+
+const getFiltered = async (req, res) => {
+  try {
+    const { brand, color, priceRange } = req.body;
+    let args = {};
+    if (brand) args.brand = brand;
+    if (color) args.color = color;
+    console.log(priceRange);
+    if (priceRange) args.price = { $gte: priceRange[0], $lte: priceRange[1] };
+    const products = await productModel.find(args);
+    res.status(200).send({
+      success: true,
+      message:'Got Products Successfully',
+      productCount: products.length,
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      error,
+      message: "Error While Filtering Products",
+    });
+  }
+};
+module.exports = { createProduct, getAll, getProduct, getFiltered };
