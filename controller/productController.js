@@ -48,7 +48,6 @@ const getFiltered = async (req, res) => {
     let args = {};
     if (brand) args.brand = brand;
     if (color) args.color = color;
-    console.log(priceRange);
     if (priceRange) args.price = { $gte: priceRange[0], $lte: priceRange[1] };
     const products = await productModel.find(args);
     res.status(200).send({
