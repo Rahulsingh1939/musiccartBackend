@@ -4,6 +4,8 @@ const {
   getAll,
   getProduct,
   getFiltered,
+  productListController,
+  productCountController,
 } = require("../controller/productController");
 
 const router = express.Router();
@@ -19,5 +21,12 @@ router.get("/all-products", getAll);
 
 // Get Filtered Products
 router.post("/filtered-products", getFiltered);
+
+//product count
+router.get("/product-count", productCountController);
+
+//product per page
+router.get("/product-list/:page", productListController);
+
 
 module.exports = router;
