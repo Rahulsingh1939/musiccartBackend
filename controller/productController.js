@@ -118,15 +118,18 @@ const productListController = async (req, res) => {
 const searchProductController = async (req, res) => {
   try {
     const { keyword } = req.params;
-    const resutls = await productModel
+    const products = await productModel
       .find({
         $or: [
           { name: { $regex: keyword, $options: "i" } },
           { description: { $regex: keyword, $options: "i" } },
           { About: { $regex: keyword, $options: "i" } },
         ],
-      })
-    res.json(resutls);
+      });
+      res.status(200).send({
+        success: true,
+        products,
+      });
   } catch (error) {
     console.log(error);
     res.status(400).send({
