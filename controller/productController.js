@@ -26,7 +26,6 @@ const getProduct = async (req, res) => {
   try {
     const product = await productModel
       .findOne({ slug: req.params.slug })
-      .populate("category");
     res.status(200).send({
       success: true,
       message: "Got Item Successfully",
@@ -44,11 +43,12 @@ const getProduct = async (req, res) => {
 
 const getFiltered = async (req, res) => {
   try {
-    const { brand, color, priceRange } = req.body;
+    const { category,brand, color, priceRange } = req.body;
     // const perPage = 8;
     // const page = req.params.page ? req.params.page : 1;
     let args = {};
     if (brand) args.brand = brand;
+    if(category) args.category = category;
     if (color) args.color = color;
     if (priceRange) args.price = { $gte: priceRange[0], $lte: priceRange[1] };
     const products = await productModel
