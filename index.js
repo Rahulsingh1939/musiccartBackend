@@ -28,7 +28,6 @@ app.use(bodyparser.json());
 app.use(express.static("public"));
 app.use(cors());
 
-app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
   res.json({ status: "Success", message: "Everything Fine" });
