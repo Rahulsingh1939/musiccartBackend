@@ -5,7 +5,7 @@ const createProduct = async (req, res) => {};
 //Get All Products
 const getAll = async (req, res) => {
   try {
-    const products = await productModel.find({}).populate("category").limit(8);
+    const products = await productModel.find({}).limit(8);
     res.status(200).send({
       success: true,
       productCount: products.length,
@@ -24,8 +24,7 @@ const getAll = async (req, res) => {
 
 const getProduct = async (req, res) => {
   try {
-    const product = await productModel
-      .findOne({ slug: req.params.slug })
+    const product = await productModel.findOne({ slug: req.params.slug });
     res.status(200).send({
       success: true,
       message: "Got Item Successfully",
@@ -43,19 +42,24 @@ const getProduct = async (req, res) => {
 
 const getFiltered = async (req, res) => {
   try {
-    const { category,brand, color, priceRange } = req.body;
+    const { category, brand, color } = req.body;
+    const priceRange =req.body.price;
     // const perPage = 8;
     // const page = req.params.page ? req.params.page : 1;
     let args = {};
     if (brand) args.brand = brand;
-    if(category) args.category = category;
+    if (category) args.category = category;
     if (color) args.color = color;
-    if (priceRange) args.price = { $gte: priceRange[0], $lte: priceRange[1] };
-    const products = await productModel
-      .find(args)
-      .sort({ _id: 1 }) 
-      // .skip((page - 1) * perPage)
-      // .limit(perPage);
+    if (priceRange) {
+      if (priceRange.length === 1) {
+        args.price = { $gte: priceRange[0] };
+      } else if (priceRange.length === 2) {
+        args.price = { $gte: priceRange[0], $lte: priceRange[1] };
+      }
+    }
+    const products = await productModel.find(args).sort({ _id: 1 });
+    // .skip((page - 1) * perPage)
+    // .limit(perPage);
     res.status(200).send({
       success: true,
       message: "Got Products Successfully",
@@ -93,10 +97,19 @@ const productCountController = async (req, res) => {
 // product list base on page
 const productListController = async (req, res) => {
   try {
-    const perPage = 8;
+     perPage = 8;
     const page = req.params.page ? req.params.page : 1;
+    const sortString = req.query.sort;
+    let sort={"name":1};
+    if(sortString=="name") sort={"name":1};
+    else if(sortString=="-name") sort={"name":-1};
+    else if(sortString=="price") sort={"price":1};
+    else if(sortString=="-price") sort={"price":-1};
+    
+    if(sortString)  perPage=50;
     const products = await productModel
       .find({})
+      .sort(sort)
       .skip((page - 1) * perPage)
       .limit(perPage);
     res.status(200).send({
@@ -113,23 +126,21 @@ const productListController = async (req, res) => {
   }
 };
 
-
 // search product
 const searchProductController = async (req, res) => {
   try {
     const { keyword } = req.params;
-    const products = await productModel
-      .find({
-        $or: [
-          { name: { $regex: keyword, $options: "i" } },
-          { description: { $regex: keyword, $options: "i" } },
-          { About: { $regex: keyword, $options: "i" } },
-        ],
-      });
-      res.status(200).send({
-        success: true,
-        products,
-      });
+    const products = await productModel.find({
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+        { About: { $regex: keyword, $options: "i" } },
+      ],
+    });
+    res.status(200).send({
+      success: true,
+      products,
+    });
   } catch (error) {
     console.log(error);
     res.status(400).send({
